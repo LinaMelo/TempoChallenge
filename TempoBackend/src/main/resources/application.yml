@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tempodb
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  springdoc:
+    api-docs:
+      enabled: true
+    swagger-ui:
+      enabled: true
+      path: /swagger-ui.html
+      custom-css: |-
+        .opblock-summary-path {
+          white-space: nowrap; /* Evita texto vertical */
+          overflow: hidden;
+          text-overflow: ellipsis; /* Agrega "..." para texto largo */
+          max-width: 400px; /* Ajusta el ancho máximo */
+        }
+        .swagger-ui .opblock {
+          zoom: 0.9; /* Ajusta el tamaño general */
+        }
+        custom-site-title: "API Transactions"
+        display-request-duration: true
+
+  logging:
+    level:
+      org.springframework: DEBUG
+      org.springdoc: DEBUG
