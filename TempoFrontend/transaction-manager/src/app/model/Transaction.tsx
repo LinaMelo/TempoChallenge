@@ -3,5 +3,5 @@ export interface Transaction {
   nameClient: string;
   amount: number;
   commerce: string;
-  transactionDate?: Date;
+  transactionDate: string;
 }
