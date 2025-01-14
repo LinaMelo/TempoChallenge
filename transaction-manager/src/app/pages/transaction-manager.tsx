@@ -23,15 +23,17 @@ import { useAddTransaction } from "../hooks/useAddTransaction";
 import { useUpdateTransaction } from "../hooks/useUpdateTransaction";
 import { CalendarIcon } from "lucide-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useDeleteTransaction } from "../hooks/useDeleteTransaction";
 
 export default function TransactionManager() {
   const { data: transactions = [], isLoading, isError } = useTransactions();
   const { mutate: addTransaction, isLoading: isAdding } = useAddTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
+  const { mutate: deleteTransaction, isLoading: isDeleting } = useDeleteTransaction();
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
 
   const { toast } = useToast();
@@ -66,23 +68,27 @@ export default function TransactionManager() {
   };
 
   const handleDeleteTransaction = async () => {
-    setIsDeleting(true);
-    try {
-      setIsDeleting(false);
-      toast({
-        title: "Éxito",
-        description: "Transacción eliminada correctamente",
-      });
-    } catch (error) {
-      console.log("Error al eliminar la transacción", error);
-      setIsDeleting(false);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la transacción",
-        variant: "destructive",
-      });
-    }
+    if (!deletingTransactionId) return;
+    deleteTransaction(deletingTransactionId, {
+      onSuccess: () => {
+        setDeletingTransactionId(null);
+        toast({
+          title: "Éxito",
+          description: "Transacción eliminada correctamente",
+        });
+      },
+      onError: (error: Error) => {
+        setDeletingTransactionId(null);
+        toast({
+          title: "Error",
+          description: "No se pudo eliminar la transacción",
+          variant: "destructive",
+        });
+        console.error("Error al eliminar la transacción:", error);
+      },
+    });
   };
+
 
   const handleUpdateTransaction = async (updatedTransaction: Transaction): Promise<boolean> => {
     try {
@@ -122,7 +128,7 @@ export default function TransactionManager() {
 
       <div className="mb-4 flex justify-end">
         <AddTransactionDialog onAddTransaction={handleAddTransaction} isAdding={isAdding}>
-          <Button className="w-full md:w-auto " disabled={isAdding} style={{backgroundColor:'#06A77D'}}>
+          <Button className="w-full md:w-auto " disabled={isAdding} style={{ backgroundColor: '#06A77D' }}>
             {isAdding ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -182,6 +188,7 @@ export default function TransactionManager() {
                     <TrashIcon className="h-4 w-4 text-red-500" />
                   )}
                 </Button>
+
               </div>
             </CardContent>
           </Card>
@@ -208,27 +215,33 @@ export default function TransactionManager() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => await handleDeleteTransaction()}>{isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 'Eliminar'}</AlertDialogAction>
+            <AlertDialogAction
+              onClick={async () => await handleDeleteTransaction()}
+              disabled={isDeleting}
+            >
+              {isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 'Eliminar'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+
       {/* La Paginación */}
       <div className="flex justify-center items-center mt-4">
-        <Button style={{backgroundColor:'#0081a7'}}
+        <Button style={{ backgroundColor: '#0081a7' }}
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeftIcon className="h-4 w-4" />
-          
+
         </Button>
         <span className="mx-2">Página {currentPage} de {totalPages}</span>
-        <Button style={{backgroundColor:'#0081a7'}}
+        <Button style={{ backgroundColor: '#0081a7' }}
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           <ChevronRightIcon className="h-4 w-4" />
-          
+
         </Button>
       </div>
     </div>
