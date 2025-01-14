@@ -5,35 +5,49 @@ services:
     build:
       context: ./TempoBackend
       dockerfile: Dockerfile
+    container_name: transaction-backend
     ports:
-      - "8080:8080"
+      - "8080:8080" 
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/tempodb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       - db
-
+    networks:
+      - transaction-network
 
   db:
     image: postgres:15
-    container_name: postgres
-    ports:
-      - "5432:5432"
+    container_name: tempo-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
       POSTGRES_DB: tempodb
+    ports:
+      - "5432:5432" # Exponer la base de datos en el puerto 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    networks:
+      - transaction-network
 
   frontend:
     build:
       context: ./transaction-manager
       dockerfile: Dockerfile
+    container_name: transaction-frontend
     ports:
-      - "3000:80"
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://backend:8080
     depends_on:
       - backend
+    networks:
+      - transaction-network
 
 volumes:
-  postgres_data: {}
+  postgres_data:
+
+networks:
+  transaction-network:
+    driver: bridge

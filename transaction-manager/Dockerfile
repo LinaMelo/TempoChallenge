@@ -1,19 +1,36 @@
-# Dockerfile para el Frontend
+# Etapa 1: Construcción
 FROM node:19-alpine AS builder
-
 WORKDIR /app
 
-COPY package*.json ./
+# Copiar archivos necesarios para instalar dependencias
+COPY package.json package-lock.json ./
+
+# Instalar dependencias
 RUN npm install
 
+# Copiar el código del proyecto
 COPY . .
 
+# Construir la aplicación Next.js
 RUN npm run build
 
-# Servidor de producción
-FROM nginx:alpine
+# Etapa 2: Producción
+FROM node:19-alpine AS runner
+WORKDIR /app
 
-COPY --from=builder /app/out /usr/share/nginx/html
+# Configurar variables de entorno
+ENV NODE_ENV production
 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Copiar el build y archivos necesarios desde la etapa de construcción
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+
+# Instalar dependencias de producción
+RUN npm install --omit=dev
+
+# Exponer el puerto para la aplicación Next.js
+EXPOSE 3000
+
+# Comando para ejecutar la aplicación
+CMD ["npm", "start"]
