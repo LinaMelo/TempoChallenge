@@ -26,7 +26,7 @@ Este proyecto es una aplicación web para gestionar transacciones, desarrollada 
    cd TempoChallenge
    ```
 
-### Ejecución
+### Ejecución con Docker
 
 1. Construir y levantar los contenedores:
    ```bash
@@ -44,6 +44,48 @@ Este proyecto es una aplicación web para gestionar transacciones, desarrollada 
    ```
 
 ---
+
+## Ejecución local sin Docker
+
+1. Asegúrate de tener instalados los siguientes requisitos:
+   - Node.js (versión 19 o superior).
+   - PostgreSQL.
+   - Java 17.
+
+2. Configura la base de datos PostgreSQL:
+   - Crea una base de datos llamada `tempodb`.
+   - Actualiza las credenciales de acceso en el archivo `src/main/resources/application.yml`.
+
+3. Clona el repositorio:
+   ```bash
+   git clone <url_del_repositorio>
+   cd gestor-transacciones
+   ```
+
+4. Ejecuta el backend:
+   - Navega al directorio del backend:
+     ```bash
+     cd backend
+     ```
+   - Compila y ejecuta la aplicación con Maven:
+     ```bash
+     ./mvnw spring-boot:run
+     ```
+
+5. Ejecuta el frontend:
+   - Navega al directorio del frontend:
+     ```bash
+     cd frontend
+     ```
+   - Instala las dependencias y ejecuta la aplicación:
+     ```bash
+     npm install
+     npm start
+     ```
+
+6. Accede a la aplicación:
+   - Frontend: [http://localhost:3000](http://localhost:3000)
+   - Backend: [http://localhost:8080](http://localhost:8080)
 
 
 ## Uso de la API
@@ -156,8 +198,6 @@ Para hacer uso de esta y levantar los contenedores:
   docker-compose logs -f
   ```
 - Asegúrate de que el puerto 5432 (PostgreSQL), 8080 (Backend) y 3000 (Frontend) estén disponibles en tu sistema.
-
-
 
 
 
