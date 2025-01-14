@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Box } from "@mui/material";
 import { useToast } from "@/hooks/use-toast";
 import { Transaction } from "../model/Transaction";
 import { EditTransactionDialog } from "../components/edit-dialog";
@@ -26,7 +25,7 @@ import { CalendarIcon } from "lucide-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
 export default function TransactionManager() {
-  const { data: transactions = [], isLoading, isError, error } = useTransactions();
+  const { data: transactions = [], isLoading, isError } = useTransactions();
   const { mutate: addTransaction, isLoading: isAdding } = useAddTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
 
@@ -56,6 +55,7 @@ export default function TransactionManager() {
       });
       return true;
     } catch (error) {
+      console.error("Error al agregar la transacción", error);
       toast({
         title: "Error",
         description: "Hubo un problema al agregar la transacción",
@@ -65,7 +65,7 @@ export default function TransactionManager() {
     }
   };
 
-  const handleDeleteTransaction = async (id: string) => {
+  const handleDeleteTransaction = async () => {
     setIsDeleting(true);
     try {
       setIsDeleting(false);
@@ -74,6 +74,7 @@ export default function TransactionManager() {
         description: "Transacción eliminada correctamente",
       });
     } catch (error) {
+      console.log("Error al eliminar la transacción", error);
       setIsDeleting(false);
       toast({
         title: "Error",
@@ -207,7 +208,7 @@ export default function TransactionManager() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => await handleDeleteTransaction(deletingTransactionId!)}>{isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 'Eliminar'}</AlertDialogAction>
+            <AlertDialogAction onClick={async () => await handleDeleteTransaction()}>{isDeleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : 'Eliminar'}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

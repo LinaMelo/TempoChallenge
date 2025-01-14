@@ -20,7 +20,7 @@ const schema = yup.object({
     .date()
     .typeError("Debe ser una fecha válida")
     .required("La Fecha es requerida")
-    .max(new Date(), "La fecha y hora no pueden ser futuras"),
+    .max(new Date(), "La fecha y hora no pueden ser futuras o iguales a la actual"),
 }).required();
 
 type TransactionFormData = yup.InferType<typeof schema>;
@@ -47,7 +47,7 @@ export function TransactionForm({ transaction, onSubmit, onCancel, isSubmitting 
     // Convertir la fecha de transacción a UTC
     const transactionDateLocal = data.transactionDate
     ? new Date(data.transactionDate).toLocaleString("sv-SE").replace(" ", "T")
-    : undefined;
+    : "";
   
     const normalizedData = {
       ...data,
